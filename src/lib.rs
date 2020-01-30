@@ -13,8 +13,10 @@ impl Preprocessor for OpenOn {
 
     fn run(&self, ctx: &PreprocessorContext, mut book: Book) -> Result<Book> {
         let book_root = &ctx.root;
+        let src_root = book_root.join(&ctx.config.book.src);
         let git_root = find_git(book_root).unwrap();
         log::debug!("Book root: {}", book_root.display());
+        log::debug!("Src root: {}", src_root.display());
         log::debug!("Git root: {}", git_root.display());
 
         let repository_url = match ctx.config.get("output.html.git-repository-url") {
@@ -38,7 +40,7 @@ impl Preprocessor for OpenOn {
             }
 
             if let BookItem::Chapter(ref mut chapter) = *item {
-                res = Some(open_on(&git_root, book_root, &repository_url, chapter).map(|md| {
+                res = Some(open_on(&git_root, &src_root, &repository_url, chapter).map(|md| {
                     chapter.content = md;
                 }));
             }
@@ -48,12 +50,20 @@ impl Preprocessor for OpenOn {
     }
 }
 
-fn open_on(git_root: &Path, book_root: &Path, base_url: &str, chapter: &mut Chapter) -> Result<String> {
+fn open_on(git_root: &Path, src_root: &Path, base_url: &str, chapter: &mut Chapter) -> Result<String> {
     let content = &chapter.content;
-    let path = book_root.join(&chapter.path);
+    let path = match src_root.join(&chapter.path).canonicalize() {
+        Ok(path) => path,
+        Err(_) => return Ok(content.into()),
+    };
     let relpath = path.strip_prefix(git_root).unwrap();
+    log::trace!("Chapter path: {}", path.display());
+    log::trace!("Relative path: {}", relpath.display());
 
-    let link = format!("<a href=\"{}/edit/master/{}\">Edit this file on GitHub.</a>", base_url, relpath.display());
+    let url = format!("{}/edit/master/{}", base_url, relpath.display());
+    log::trace!("URL: {}", url);
+
+    let link = format!("<a href=\"{}\">Edit this file on GitHub.</a>", url);
     let content = format!("{}\n<footer id=\"open-on-gh\">Found a bug? {}</footer>", content, link);
 
     Ok(content)
