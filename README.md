@@ -48,8 +48,8 @@ footer {
 }
 ```
 
-This code blocks shrinks the text size, center-aligns it under the rest of the content
-and adds a small horizontal bar above the text to separate it form the page content.
+This code block shrinks the text size, center-aligns it under the rest of the content
+and adds a small horizontal bar above the text to separate it from the page content.
 
 
 Finally, build your book as normal:
