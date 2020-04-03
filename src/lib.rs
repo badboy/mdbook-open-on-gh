@@ -52,6 +52,11 @@ impl Preprocessor for OpenOn {
 
 fn open_on(git_root: &Path, src_root: &Path, base_url: &str, chapter: &mut Chapter) -> Result<String> {
     let content = &chapter.content;
+
+    let footer_start = "<footer id=\"open-on-gh\">";
+    if content.contains(footer_start) {
+        return Ok(content.into())
+    }
     let path = match src_root.join(&chapter.path).canonicalize() {
         Ok(path) => path,
         Err(_) => return Ok(content.into()),
@@ -64,7 +69,7 @@ fn open_on(git_root: &Path, src_root: &Path, base_url: &str, chapter: &mut Chapt
     log::trace!("URL: {}", url);
 
     let link = format!("<a href=\"{}\">Edit this file on GitHub.</a>", url);
-    let content = format!("{}\n<footer id=\"open-on-gh\">Found a bug? {}</footer>", content, link);
+    let content = format!("{}\n{}Found a bug? {}</footer>", content, footer_start, link);
 
     Ok(content)
 }
