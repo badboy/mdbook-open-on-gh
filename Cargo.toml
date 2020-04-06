@@ -1,6 +1,6 @@
 [package]
 name = "mdbook-open-on-gh"
-version = "1.1.1-alpha.0"
+version = "1.1.1"
 authors = ["Jan-Erik Rediger <janerik@fnordig.de>"]
 description = "mdbook preprocessor to add a open-on-github link on every page"
 license = "MPL-2.0"
