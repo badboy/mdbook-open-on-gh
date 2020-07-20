@@ -33,6 +33,13 @@ impl Preprocessor for OpenOn {
             return Ok(book)
         }
 
+        let branch = match ctx.config.get("output.html.git-branch") {
+            None => "master",
+            Some(toml::Value::String(b)) => b,
+            _ => return Ok(book),
+        };
+        log::debug!("Git Branch: {}", branch);
+
         let mut res = None;
         book.for_each_mut(|item: &mut BookItem| {
             if let Some(Err(_)) = res {
@@ -40,7 +47,7 @@ impl Preprocessor for OpenOn {
             }
 
             if let BookItem::Chapter(ref mut chapter) = *item {
-                res = Some(open_on(&git_root, &src_root, &repository_url, chapter).map(|md| {
+                res = Some(open_on(&git_root, &src_root, &repository_url, &branch, chapter).map(|md| {
                     chapter.content = md;
                 }));
             }
@@ -50,7 +57,7 @@ impl Preprocessor for OpenOn {
     }
 }
 
-fn open_on(git_root: &Path, src_root: &Path, base_url: &str, chapter: &mut Chapter) -> Result<String> {
+fn open_on(git_root: &Path, src_root: &Path, base_url: &str, branch: &str, chapter: &mut Chapter) -> Result<String> {
     let content = &chapter.content;
 
     let footer_start = "<footer id=\"open-on-gh\">";
@@ -65,7 +72,7 @@ fn open_on(git_root: &Path, src_root: &Path, base_url: &str, chapter: &mut Chapt
     log::trace!("Chapter path: {}", path.display());
     log::trace!("Relative path: {}", relpath.display());
 
-    let url = format!("{}/edit/master/{}", base_url, relpath.display());
+    let url = format!("{}/edit/{}/{}", base_url, branch, relpath.display());
     log::trace!("URL: {}", url);
 
     let link = format!("<a href=\"{}\">Edit this file on GitHub.</a>", url);
