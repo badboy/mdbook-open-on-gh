@@ -30,7 +30,7 @@ impl Preprocessor for OpenOn {
         log::debug!("Repository URL: {}", repository_url);
 
         if repository_url.find("github.com").is_none() {
-            return Ok(book)
+            return Ok(book);
         }
 
         let branch = match ctx.config.get("output.html.git-branch") {
@@ -47,9 +47,11 @@ impl Preprocessor for OpenOn {
             }
 
             if let BookItem::Chapter(ref mut chapter) = *item {
-                res = Some(open_on(&git_root, &src_root, &repository_url, &branch, chapter).map(|md| {
-                    chapter.content = md;
-                }));
+                res = Some(
+                    open_on(&git_root, &src_root, &repository_url, &branch, chapter).map(|md| {
+                        chapter.content = md;
+                    }),
+                );
             }
         });
 
@@ -57,19 +59,23 @@ impl Preprocessor for OpenOn {
     }
 }
 
-fn open_on(git_root: &Path, src_root: &Path, base_url: &str, branch: &str, chapter: &mut Chapter) -> Result<String> {
+fn open_on(
+    git_root: &Path,
+    src_root: &Path,
+    base_url: &str,
+    branch: &str,
+    chapter: &mut Chapter,
+) -> Result<String> {
     let content = &chapter.content;
 
     let footer_start = "<footer id=\"open-on-gh\">";
     if content.contains(footer_start) {
-        return Ok(content.into())
+        return Ok(content.into());
     }
 
     let path = match chapter.path.as_ref() {
-        None => {
-            return Ok("".into())
-        },
-        Some(path) => path
+        None => return Ok("".into()),
+        Some(path) => path,
     };
     let path = match src_root.join(&path).canonicalize() {
         Ok(path) => path,
@@ -83,7 +89,10 @@ fn open_on(git_root: &Path, src_root: &Path, base_url: &str, branch: &str, chapt
     log::trace!("URL: {}", url);
 
     let link = format!("<a href=\"{}\">Edit this file on GitHub.</a>", url);
-    let content = format!("{}\n{}Found a bug? {}</footer>", content, footer_start, link);
+    let content = format!(
+        "{}\n{}Found a bug? {}</footer>",
+        content, footer_start, link
+    );
 
     Ok(content)
 }
@@ -96,7 +105,7 @@ fn find_git(path: &Path) -> Option<PathBuf> {
     while !git_dir.exists() {
         current_path = match current_path.parent() {
             Some(p) => p,
-            None => return None
+            None => return None,
         };
 
         if current_path == root {
