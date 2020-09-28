@@ -17,7 +17,7 @@ main() {
 
     test -f Cargo.lock || cargo generate-lockfile
 
-    cross rustc --bin mdbook-open-on-gh --target $TARGET --release -- -C lto
+    cross rustc --bin mdbook-open-on-gh --target $TARGET --release
 
     cp target/$TARGET/release/mdbook-open-on-gh $stage/
 
