@@ -64,7 +64,14 @@ fn open_on(git_root: &Path, src_root: &Path, base_url: &str, branch: &str, chapt
     if content.contains(footer_start) {
         return Ok(content.into())
     }
-    let path = match src_root.join(&chapter.path).canonicalize() {
+
+    let path = match chapter.path.as_ref() {
+        None => {
+            return Ok("".into())
+        },
+        Some(path) => path
+    };
+    let path = match src_root.join(&path).canonicalize() {
         Ok(path) => path,
         Err(_) => return Ok(content.into()),
     };
