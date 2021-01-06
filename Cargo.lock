@@ -756,7 +756,7 @@ dependencies = [
 
 [[package]]
 name = "mdbook-open-on-gh"
-version = "1.4.1"
+version = "1.4.2-alpha.0"
 dependencies = [
  "clap",
  "env_logger",
