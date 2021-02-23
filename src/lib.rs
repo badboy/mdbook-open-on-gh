@@ -34,7 +34,7 @@ impl Preprocessor for OpenOn {
         }
 
         let branch = match ctx.config.get("output.html.git-branch") {
-            None => "master",
+            None => "main",
             Some(toml::Value::String(b)) => b,
             _ => return Ok(book),
         };
