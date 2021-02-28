@@ -73,14 +73,40 @@ fn open_on(
         return Ok(content.into());
     }
 
-    let path = match chapter.path.as_ref() {
-        None => return Ok("".into()),
+    let path = chapter
+        .path
+        .as_ref()
+        .map(|path| {
+            match src_root.join(&path).canonicalize() {
+                Ok(path) => Some(path),
+                Err(e) => match e.kind() {
+                    std::io::ErrorKind::NotFound if path.ends_with("index.md") => {
+                        // default index preprocessor rewrites README.md into index.md
+                        // account this as sepcial case to support index pages
+                        let mut parent = path.clone();
+                        parent.pop();
+                        match src_root.join(&parent).join("README.md").canonicalize() {
+                            Ok(path) => Some(path),
+                            _ => None,
+                        }
+                    }
+                    _ => None,
+                },
+            }
+        })
+        .flatten();
+
+    let path = match path {
         Some(path) => path,
+        None => {
+            eprintln!(
+                "[WARN]: Skipped adding opne-oh-gh link for chatper `{}`. Failed to resolve file path: {:?}.",
+                chapter.name, chapter.path,
+            );
+            return Ok(content.into());
+        }
     };
-    let path = match src_root.join(&path).canonicalize() {
-        Ok(path) => path,
-        Err(_) => return Ok(content.into()),
-    };
+
     let relpath = path.strip_prefix(git_root).unwrap();
     log::trace!("Chapter path: {}", path.display());
     log::trace!("Relative path: {}", relpath.display());
