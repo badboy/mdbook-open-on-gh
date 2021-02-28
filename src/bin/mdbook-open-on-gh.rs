@@ -35,7 +35,7 @@ fn handle_preprocessing() -> Result<(), Error> {
 
     if ctx.mdbook_version != mdbook::MDBOOK_VERSION {
         eprintln!(
-            "Warning: The mdbook-open-on-gh preprocessor was built against version \
+            "[WARN]: The mdbook-open-on-gh preprocessor was built against version \
              {} of mdbook, but we're being called from version {}",
             mdbook::MDBOOK_VERSION,
             ctx.mdbook_version
