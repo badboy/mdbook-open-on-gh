@@ -1,4 +1,4 @@
-use clap::{crate_version, Command, Arg, ArgMatches};
+use clap::{crate_version, Arg, ArgMatches, Command};
 use mdbook::errors::Error;
 use mdbook::preprocess::{CmdPreprocessor, Preprocessor};
 use mdbook_open_on_gh::OpenOn;
