@@ -1,4 +1,4 @@
-use clap::{crate_version, App, Arg, ArgMatches, SubCommand};
+use clap::{crate_version, Command, Arg, ArgMatches};
 use mdbook::errors::Error;
 use mdbook::preprocess::{CmdPreprocessor, Preprocessor};
 use mdbook_open_on_gh::OpenOn;
@@ -6,13 +6,13 @@ use mdbook_open_on_gh::OpenOn;
 use std::io;
 use std::process;
 
-pub fn make_app() -> App<'static, 'static> {
-    App::new("mdbook-open-on-gh")
+pub fn make_app() -> Command<'static> {
+    Command::new("mdbook-open-on-gh")
         .version(crate_version!())
         .about("mdbook preprocessor to add links to open the page on GitHub")
         .subcommand(
-            SubCommand::with_name("supports")
-                .arg(Arg::with_name("renderer").required(true))
+            Command::new("supports")
+                .arg(Arg::new("renderer").required(true))
                 .about("Check whether a renderer is supported by this preprocessor"),
         )
 }
