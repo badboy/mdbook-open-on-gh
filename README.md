@@ -6,6 +6,7 @@ A preprocessor for [mdbook][] to add a open-on-github link on every page.
 
 It adds an "Edit this file on GitHub" link on the bottom of every page, linking directly to the source file.
 It uses the configured `git-repository-url` as the base.
+Note that it assumes you use the `main` branch as your default branch - not `master`.
 
 ## Installation
 
