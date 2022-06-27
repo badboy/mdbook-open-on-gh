@@ -23,19 +23,22 @@ command = "mdbook-open-on-gh"
 renderer = ["html"]
 ```
 
-Add a repository URL to use as a base in your `book.toml`:
+## Configuration
+
+`mdbook-open-on-gh` is configured using additional options under `[output.html]`:
+
 
 ```toml
 [output.html]
-git-repository-url = "https://github.com/mozilla/glean"
-```
+# Required: Your repository URL used in the link.
+git-repository-url = "https://github.com/$user/$project"
 
-By default it assumes the repository has a `main` branch.
-You can configure another branch using the `git-branch` option:
+# Your git branch. Defaults to `main`
+git-branch = "main"
 
-```toml
-[output.html]
-git-branch = "trunk"
+# The text to use in the footer.
+# The link text is marked by `[]`
+open-on-text = "Found a bug? [Edit this page on GitHub.]"
 ```
 
 To style the footer add a custom CSS file for your HTML output:
@@ -69,4 +72,4 @@ mdbook path/to/book
 ## License
 
 MPL. See [LICENSE](LICENSE).  
-Copyright (c) 2020 Jan-Erik Rediger <janerik@fnordig.de>
+Copyright (c) 2020-2022 Jan-Erik Rediger <janerik@fnordig.de>
