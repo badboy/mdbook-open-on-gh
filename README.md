@@ -30,6 +30,14 @@ Add a repository URL to use as a base in your `book.toml`:
 git-repository-url = "https://github.com/mozilla/glean"
 ```
 
+By default it assumes the repository has a `main` branch.
+You can configure another branch using the `git-branch` option:
+
+```toml
+[output.html]
+git-branch = "trunk"
+```
+
 To style the footer add a custom CSS file for your HTML output:
 
 ```toml
