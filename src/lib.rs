@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use mdbook::book::{Book, BookItem, Chapter};
-use mdbook::errors::{Result, Error};
+use mdbook::errors::{Error, Result};
 use mdbook::preprocess::{Preprocessor, PreprocessorContext};
 
 pub struct OpenOn;
@@ -119,7 +119,9 @@ fn open_on(
 
     let (pre, link_text, post) = match parse_footer_text(&open_on_text) {
         Some(parsed) => parsed,
-        None => Err(Error::msg("can't parse footer text. Missing `[link text]`?"))?
+        None => Err(Error::msg(
+            "can't parse footer text. Missing `[link text]`?",
+        ))?,
     };
 
     let link = format!("<a href=\"{}\">{}</a>", url, link_text);
