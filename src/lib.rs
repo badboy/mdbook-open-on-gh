@@ -29,7 +29,7 @@ impl Preprocessor for OpenOn {
         };
         log::debug!("Repository URL: {}", repository_url);
 
-        if repository_url.find("github.com").is_none() {
+        if !repository_url.contains("github.com") {
             return Ok(book);
         }
 
@@ -58,9 +58,9 @@ impl Preprocessor for OpenOn {
                     open_on(
                         &git_root,
                         &src_root,
-                        &repository_url,
-                        &branch,
-                        &open_on_text,
+                        repository_url,
+                        branch,
+                        open_on_text,
                         chapter,
                     )
                     .map(|md| {
@@ -117,7 +117,7 @@ fn open_on(
     let url = format!("{}/edit/{}/{}", base_url, branch, relpath.display());
     log::trace!("URL: {}", url);
 
-    let (pre, link_text, post) = match parse_footer_text(&open_on_text) {
+    let (pre, link_text, post) = match parse_footer_text(open_on_text) {
         Some(parsed) => parsed,
         None => Err(Error::msg(
             "can't parse footer text. Missing `[link text]`?",
