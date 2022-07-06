@@ -4,6 +4,11 @@ on: [push, pull_request]
 
 env:
   RUSTFLAGS: -Dwarnings
+  CARGO_INCREMENTAL: 0
+  CARGO_NET_RETRY: 10
+  CI: 1
+  RUST_BACKTRACE: short
+  RUSTUP_MAX_RETRIES: 10
 
 jobs:
   build_and_test:
@@ -21,7 +26,10 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         toolchain: ${{ matrix.rust }}
+        profile: minimal
         override: true
+
+    - uses: Swatinem/rust-cache@v1
 
     - name: check
       uses: actions-rs/cargo@v1
@@ -45,6 +53,8 @@ jobs:
         toolchain: stable
         components: rustfmt, clippy
         override: true
+
+    - uses: Swatinem/rust-cache@v1
 
     - name: fmt
       run: cargo fmt --all -- --check

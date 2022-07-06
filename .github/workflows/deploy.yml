@@ -39,15 +39,6 @@ jobs:
       - name: Setup | Checkout
         uses: actions/checkout@v2
 
-      # Cache files between builds
-      - name: Setup | Cache Cargo
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
       - name: Setup | Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -55,6 +46,8 @@ jobs:
           override: true
           profile: minimal
           target: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v1
 
       - name: Setup | musl tools
         if: matrix.target == 'x86_64-unknown-linux-musl'
