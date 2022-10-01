@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use mdbook::book::{Book, BookItem, Chapter};
 use mdbook::errors::{Error, Result};
@@ -14,10 +14,8 @@ impl Preprocessor for OpenOn {
     fn run(&self, ctx: &PreprocessorContext, mut book: Book) -> Result<Book> {
         let book_root = &ctx.root;
         let src_root = book_root.join(&ctx.config.book.src);
-        let git_root = find_git(book_root).unwrap();
         log::debug!("Book root: {}", book_root.display());
         log::debug!("Src root: {}", src_root.display());
-        log::debug!("Git root: {}", git_root.display());
 
         let repository_url = match ctx.config.get("output.html.git-repository-url") {
             None => return Ok(book),
@@ -56,7 +54,6 @@ impl Preprocessor for OpenOn {
             if let BookItem::Chapter(ref mut chapter) = *item {
                 res = Some(
                     open_on(
-                        &git_root,
                         &src_root,
                         repository_url,
                         branch,
@@ -88,7 +85,6 @@ fn parse_footer_text(text: &str) -> Option<(&str, &str, &str)> {
 }
 
 fn open_on(
-    git_root: &Path,
     src_root: &Path,
     base_url: &str,
     branch: &str,
@@ -110,7 +106,7 @@ fn open_on(
         Ok(path) => path,
         Err(_) => return Ok(content.into()),
     };
-    let relpath = path.strip_prefix(git_root).unwrap();
+    let relpath = path.strip_prefix(src_root)?;
     log::trace!("Chapter path: {}", path.display());
     log::trace!("Relative path: {}", relpath.display());
 
@@ -131,27 +127,6 @@ fn open_on(
     );
 
     Ok(content)
-}
-
-fn find_git(path: &Path) -> Option<PathBuf> {
-    let mut current_path = path;
-    let mut git_dir = current_path.join(".git");
-    let root = Path::new("/");
-
-    while !git_dir.exists() {
-        current_path = match current_path.parent() {
-            Some(p) => p,
-            None => return None,
-        };
-
-        if current_path == root {
-            return None;
-        }
-
-        git_dir = current_path.join(".git");
-    }
-
-    git_dir.parent().map(|p| p.to_owned())
 }
 
 #[cfg(test)]
