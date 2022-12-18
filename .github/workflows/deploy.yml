@@ -51,7 +51,7 @@ jobs:
           profile: minimal
           target: ${{ matrix.target }}
 
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
 
       - name: Setup | musl tools
         if: matrix.target == 'x86_64-unknown-linux-musl'
