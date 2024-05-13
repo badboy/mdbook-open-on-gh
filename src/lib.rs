@@ -110,7 +110,7 @@ fn open_on(
         Ok(path) => path,
         Err(_) => return Ok(content.into()),
     };
-    let relpath = path.strip_prefix(git_root).unwrap();
+    let relpath = path.strip_prefix(git_root.canonicalize().unwrap()).unwrap();
     log::trace!("Chapter path: {}", path.display());
     log::trace!("Relative path: {}", relpath.display());
 
@@ -151,7 +151,9 @@ fn find_git(path: &Path) -> Option<PathBuf> {
         git_dir = current_path.join(".git");
     }
 
-    git_dir.parent().map(|p| p.to_owned())
+    git_dir
+        .parent()
+        .and_then(|p| p.to_owned().canonicalize().ok())
 }
 
 #[cfg(test)]
