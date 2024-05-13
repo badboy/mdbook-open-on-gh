@@ -110,7 +110,7 @@ fn open_on(
         Ok(path) => path,
         Err(_) => return Ok(content.into()),
     };
-    let relpath = path.strip_prefix(git_root.canonicalize().unwrap()).unwrap();
+    let relpath = path.strip_prefix(git_root).unwrap();
     log::trace!("Chapter path: {}", path.display());
     log::trace!("Relative path: {}", relpath.display());
 
