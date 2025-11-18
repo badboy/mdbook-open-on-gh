@@ -25,7 +25,7 @@ renderer = ["html"]
 
 ## Configuration
 
-`mdbook-open-on-gh` is configured using additional options under `[output.html]`:
+`mdbook-open-on-gh` is configured using additional options under `[output.html]` and `[preprocessor.open-on-gh]`:
 
 
 ```toml
@@ -33,6 +33,7 @@ renderer = ["html"]
 # Required: Your repository URL used in the link.
 git-repository-url = "https://github.com/$user/$project"
 
+[preprocessor.open-on-gh]
 # Your git branch. Defaults to `main`
 git-branch = "main"
 

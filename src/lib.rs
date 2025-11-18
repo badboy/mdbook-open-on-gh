@@ -1,8 +1,8 @@
 use std::path::{Path, PathBuf};
 
-use mdbook::book::{Book, BookItem, Chapter};
-use mdbook::errors::{Error, Result};
-use mdbook::preprocess::{Preprocessor, PreprocessorContext};
+use mdbook_preprocessor::book::{Book, BookItem, Chapter};
+use mdbook_preprocessor::errors::{Error, Result};
+use mdbook_preprocessor::{Preprocessor, PreprocessorContext};
 
 pub struct OpenOn;
 
@@ -12,6 +12,7 @@ impl Preprocessor for OpenOn {
     }
 
     fn run(&self, ctx: &PreprocessorContext, mut book: Book) -> Result<Book> {
+        let cfg_attr = |attr| format!("preprocessor.{}.{}", self.name(), attr);
         let book_root = &ctx.root;
         let src_root = book_root.join(&ctx.config.book.src);
         let git_root = find_git(book_root).unwrap();
@@ -19,7 +20,7 @@ impl Preprocessor for OpenOn {
         log::debug!("Src root: {}", src_root.display());
         log::debug!("Git root: {}", git_root.display());
 
-        let repository_url = match ctx.config.get("output.html.git-repository-url") {
+        let repository_url = match ctx.config.get("output.html.git-repository-url")? {
             None => return Ok(book),
             Some(url) => url,
         };
@@ -33,16 +34,16 @@ impl Preprocessor for OpenOn {
             return Ok(book);
         }
 
-        let branch = match ctx.config.get("output.html.git-branch") {
-            None => "main",
+        let branch = match ctx.config.get(&cfg_attr("git-branch"))? {
+            None => "main".to_string(),
             Some(toml::Value::String(b)) => b,
             _ => return Ok(book),
         };
         log::debug!("Git Branch: {}", branch);
 
-        let open_on_text = match ctx.config.get("output.html.open-on-text") {
-            None => "Found a bug? [Edit this page on GitHub.]",
-            Some(toml::Value::String(b)) => b,
+        let open_on_text = match ctx.config.get(&cfg_attr("open-on-text"))? {
+            None => "Found a bug? [Edit this page on GitHub.]".to_string(),
+            Some(toml::Value::String(text)) => text,
             _ => return Ok(book),
         };
         log::debug!("Footer text: {}", open_on_text);
@@ -58,9 +59,9 @@ impl Preprocessor for OpenOn {
                     open_on(
                         &git_root,
                         &src_root,
-                        repository_url,
-                        branch,
-                        open_on_text,
+                        &repository_url,
+                        &branch,
+                        &open_on_text,
                         chapter,
                     )
                     .map(|md| {
