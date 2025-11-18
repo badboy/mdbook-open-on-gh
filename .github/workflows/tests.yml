@@ -1,57 +1,39 @@
 name: Tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
 
 env:
   RUSTFLAGS: -Dwarnings
-  CARGO_INCREMENTAL: 0
-  CARGO_NET_RETRY: 10
-  CI: 1
-  RUST_BACKTRACE: short
-  RUSTUP_MAX_RETRIES: 10
 
 jobs:
   build_and_test:
     name: Build and test
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        rust: [stable]
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-
-    - name: Install ${{ matrix.rust }}
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: ${{ matrix.rust }}
-        profile: minimal
-        override: true
-
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
     - uses: Swatinem/rust-cache@v2
 
     - name: tests
-      uses: actions-rs/cargo@v1
-      with:
-        command: test
-        args: --all
+      run: cargo test --all
 
   check_fmt_and_docs:
     name: Checking fmt and docs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        components: rustfmt, clippy
-        override: true
-
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
     - uses: Swatinem/rust-cache@v2
 
     - name: fmt
       run: cargo fmt --all -- --check
+
+    - name: Clippy
+      run: cargo clippy --all
 
     - name: Docs
       run: cargo doc --no-deps
