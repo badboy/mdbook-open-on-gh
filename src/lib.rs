@@ -107,7 +107,7 @@ fn open_on(
         None => return Ok("".into()),
         Some(path) => path,
     };
-    let path = match src_root.join(&path).canonicalize() {
+    let path = match src_root.join(path).canonicalize() {
         Ok(path) => path,
         Err(_) => return Ok(content.into()),
     };
@@ -140,10 +140,7 @@ fn find_git(path: &Path) -> Option<PathBuf> {
     let root = Path::new("/");
 
     while !git_dir.exists() {
-        current_path = match current_path.parent() {
-            Some(p) => p,
-            None => return None,
-        };
+        current_path = current_path.parent()?;
 
         if current_path == root {
             return None;
